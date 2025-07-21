@@ -519,3 +519,95 @@ body {
 	color: #ff4757;
 	font-size: 1.5em;
 }
+
+@media (max-width: 600px) {
+	body {
+		font-size: 14px;
+	}
+
+	.container {
+		padding: 10px 15px;
+	}
+
+	.header h1 {
+		font-size: 1.8em;
+	}
+
+	.header p {
+		font-size: 1em;
+	}
+
+	.tabs {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.tab {
+		width: 100%;
+		font-size: 15px;
+		padding: 10px;
+	}
+
+	.week-selector {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.week-btn {
+		width: 100%;
+		font-size: 15px;
+	}
+
+	.content {
+		padding: 20px;
+	}
+
+	.podium {
+		flex-direction: column;
+		align-items: center;
+		gap: 15px;
+	}
+
+	.podium-place {
+		width: 100%;
+	}
+
+	.profile-name {
+		font-size: 2em;
+	}
+
+	.profile-stats {
+		grid-template-columns: 1fr;
+		gap: 15px;
+	}
+
+	.table {
+		font-size: 13px;
+		overflow-x: auto;
+		display: block;
+	}
+
+	.streak-section {
+		grid-template-columns: 1fr;
+	}
+
+	.chart-container {
+		padding: 15px;
+	}
+
+	.bar {
+		min-width: 20px;
+		height: 100px;
+	}
+
+	.comparison-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.modal-content {
+		width: 95%;
+		margin: 10% auto;
+		padding: 20px;
+		max-height: 85vh;
+	}
+}
