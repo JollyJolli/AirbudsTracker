@@ -134,8 +134,8 @@ function updateTable(data) {
         const imgUrl = `/data/imgs/${person.originalData.foto}`;
         const row = document.createElement('tr');
         const timeFormatted = formatTime(person.minutes);
-        
         let status = '';
+
         if (person.minutes === 0) {
             status = '🪦 Semana sin ritmo';
         } else if (person.minutes <= 30) {
