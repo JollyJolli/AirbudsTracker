@@ -138,25 +138,54 @@ function updateTable(data) {
 
         if (person.minutes === 0) {
             status = '🪦 Semana sin ritmo';
-        } else if (person.minutes <= 30) {
+        } else if (person.minutes <= 15) {
             status = '😶 Silencio sospechoso';
+        } else if (person.minutes <= 30) {
+            status = '📵 Oyó una intro y apagó';
+        } else if (person.minutes <= 60) {
+            status = '🤨 Escuchó pa’ no quedar mal';
         } else if (person.minutes <= 120) {
             status = '📻 Una rolita al día';
+        } else if (person.minutes <= 200) {
+            status = '📼 Rewind mental';
         } else if (person.minutes <= 300) {
             status = '🎶 Música pa’ matar el rato';
+        } else if (person.minutes <= 450) {
+            status = '🎙️ Cantó bajito en el baño';
+        } else if (person.minutes <= 600) {
+            status = '🛸 Música mientras flota';
         } else if (person.minutes <= 800) {
             status = '🎧 Ritmo constante';
+        } else if (person.minutes <= 1000) {
+            status = '🛹 Música de fondo pa’ la movie';
+        } else if (person.minutes <= 1200) {
+            status = '🔊 Casi no le baja al volumen';
         } else if (person.minutes <= 1500) {
             status = '🔥 Siempre con audífonos';
-        } else if (person.minutes <= 2500) {
+        } else if (person.minutes <= 1800) {
+            status = '🥵 Se le queman los AirPods';
+        } else if (person.minutes <= 2200) {
             status = '🎵 En su propia película';
-        } else if (person.minutes <= 3500) {
+        } else if (person.minutes <= 2700) {
+            status = '📀 Playlist pa’ cada mood';
+        } else if (person.minutes <= 3200) {
             status = '🌀 Vibra musical intensa';
-        } else if (person.minutes <= 4500) {
+        } else if (person.minutes <= 4000) {
             status = '🚀 Vive enchufado al beat';
+        } else if (person.minutes <= 5000) {
+            status = '🧠 Mente musical 24/7';
+        } else if (person.minutes <= 6000) {
+            status = '👁️ El algoritmo lo respeta';
+        } else if (person.minutes <= 7000) {
+            status = '🕺 En la pista aunque esté solo';
+        } else if (person.minutes <= 8000) {
+            status = '💀 Viste el Spotify morir';
+        } else if (person.minutes <= 10000) {
+            status = '💽 Le metió como si cobrara';
         } else {
-            status = '👑 DIOSES DEL STREAMING';
+            status = '👑 DIOS DEL STREAMING';
         }
+
 
         row.innerHTML = `
             <td class="position">#${index + 1}</td>
@@ -332,16 +361,34 @@ function createComparison() {
         card.className = 'person-card';
         card.onclick = () => openPersonModal(person.Persona);
 
-        card.innerHTML = `
+       card.innerHTML = `
+            <div class="person-card-img">
+                <img src="/data/imgs/${person.foto}" alt="${person.Persona}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;">
+            </div>
+
             <div class="person-card-name">${person.Persona}</div>
-            <div><strong>Total:</strong> ${totalMinutes.toLocaleString()} min</div>
-            <div><strong>Promedio:</strong> ${avgMinutes.toLocaleString()} min/semana</div>
-            <div><strong>Mejor semana:</strong> ${maxMinutes.toLocaleString()} min</div>
-            <div><strong>Victorias:</strong> ${victories}</div>
+
+            <div style="font-size: 14px; color: #555;">${person.Descripcion || '🫥 Sin descripción aún'}</div>
+            <div style="font-size: 13px; color: #777;">${person.Cualidades || '🌀 No se definió'}</div>
+
+            <hr style="margin: 10px 0; border-color: #eee;">
+
+            <div><strong>🕒 Total:</strong> ${totalMinutes.toLocaleString()} min</div>
+            <div><strong>📈 Promedio:</strong> ${avgMinutes.toLocaleString()} min/semana</div>
+            <div><strong>💥 Mejor semana:</strong> ${maxMinutes.toLocaleString()} min</div>
+            <div><strong>🥇 Victorias:</strong> ${victories}</div>
+            <div><strong>🔥 Racha actual:</strong> ${person.streak || 0} semanas</div>
+            <div><strong>🏅 Racha máxima:</strong> ${person.maxStreak || 0} semanas</div>
+
+            <hr style="margin: 10px 0; border-color: #eee;">
+
+            <div><strong>🎯 Nivel:</strong> ${status}</div>
+
             <div style="margin-top: 15px;">
                 ${medals.join(' ')}
             </div>
         `;
+
 
         grid.appendChild(card);
     });
