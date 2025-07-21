@@ -606,23 +606,28 @@
         let currentWeek = '';
 
         // Cargar datos de la API
-        async function loadData() {
-            try {
-                const response = await fetch('https://api.sheetbest.com/sheets/94dfeefa-6315-4fde-9af6-301586e6a922');
-                musicData = await response.json();
-                
-                if (musicData && musicData.length > 0) {
-                    processData();
-                    hideLoading();
-                    showTab('rankings');
-                } else {
-                    showError('No se encontraron datos');
-                }
-            } catch (error) {
-                console.error('Error cargando datos:', error);
-                showError('Error al cargar los datos');
-            }
+       async function loadData() {
+    try {
+        const response = await fetch('https://api.sheetbest.com/sheets/94dfeefa-6315-4fde-9af6-301586e6a922');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status} - ${response.statusText}`);
         }
+
+        musicData = await response.json();
+
+        if (musicData && musicData.length > 0) {
+            processData();
+            hideLoading();
+            showTab('rankings');
+        } else {
+            console.warn('[AVISO] No se encontraron datos válidos en la respuesta.');
+            showError('No se encontraron datos');
+        }
+    } catch (error) {
+        console.error('[ERROR GRAVE] Fallo al cargar los datos desde la API:', error);
+        showError('Error al cargar los datos. Revisa la consola para más detalles.');
+    }
+}
 
         function processData() {
             // Extraer semanas de los datos
@@ -700,6 +705,7 @@
             
             for (let i = 0; i < Math.min(3, data.length); i++) {
                 const person = data[i === 0 ? 0 : i === 1 ? 1 : 2];
+                const imgUrl = `/data/imgs/${person.originalData.foto}`;
                 if (!person) continue;
 
                 const place = document.createElement('div');
@@ -707,15 +713,17 @@
                 
                 const timeFormatted = formatTime(person.minutes);
                 const emoji = person.minutes === 0 ? '⚰️' : i === 0 ? '👑' : i === 1 ? '🥈' : '🥉';
-                
+
                 place.innerHTML = `
-                    <div class="podium-base ${positions[i]}">
-                        <div class="podium-position">${positionNumbers[i]}</div>
-                        <div class="podium-name">${emoji} ${person.name}</div>
-                        <div class="podium-minutes">${person.minutes.toLocaleString()} min</div>
-                        <div class="podium-minutes">${timeFormatted}</div>
-                    </div>
-                `;
+    <img src="${imgUrl}" alt="${person.name}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;">
+    <div class="podium-base ${positions[i]}">
+        <div class="podium-position">${positionNumbers[i]}</div>
+        <div class="podium-name">${emoji} ${person.name}</div>
+        <div class="podium-minutes">${person.minutes.toLocaleString()} min</div>
+        <div class="podium-minutes">${timeFormatted}</div>
+    </div>
+`;
+
                 
                 podium.appendChild(place);
             }
@@ -724,15 +732,41 @@
         function updateTable(data) {
             const tbody = document.getElementById('ranking-tbody');
             tbody.innerHTML = '';
+            const imgUrl = `/data/imgs/${person.originalData.foto}`;
 
             data.forEach((person, index) => {
                 const row = document.createElement('tr');
                 const timeFormatted = formatTime(person.minutes);
-                const status = person.minutes === 0 ? '⚰️ Sin música' : '🎵 Activo';
+               let status = '';
+if (person.minutes === 0) {
+  status = '🪦 Semana sin ritmo';
+} else if (person.minutes <= 30) {
+  status = '😶 Silencio sospechoso';
+} else if (person.minutes <= 120) {
+  status = '📻 Una rolita al día';
+} else if (person.minutes <= 300) {
+  status = '🎶 Música pa’ matar el rato';
+} else if (person.minutes <= 800) {
+  status = '🎧 Ritmo constante';
+} else if (person.minutes <= 1500) {
+  status = '🔥 Siempre con audífonos';
+} else if (person.minutes <= 2500) {
+  status = '🎵 En su propia película';
+} else if (person.minutes <= 3500) {
+  status = '🌀 Vibra musical intensa';
+} else if (person.minutes <= 4500) {
+  status = '🚀 Vive enchufado al beat';
+} else {
+  status = '👑 DIOSES DEL STREAMING';
+}
+
                 
                 row.innerHTML = `
                     <td class="position">#${index + 1}</td>
-                    <td><span class="person-name" onclick="openPersonModal('${person.name}')">${person.name}</span></td>
+                    <td>
+                        <img src="${imgUrl}" alt="${person.name}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin-right: 10px;">
+                        <span class="person-name" onclick="openPersonModal('${person.name}')">${person.name}</span>
+                    </td>
                     <td>${person.minutes.toLocaleString()} minutos</td>
                     <td>${timeFormatted}</td>
                     <td>${status}</td>
@@ -841,58 +875,80 @@
         }
 
         function createComparison() {
-            const grid = document.getElementById('comparison-grid');
-            grid.innerHTML = '';
+    const grid = document.getElementById('comparison-grid');
+    grid.innerHTML = '';
 
-            musicData.forEach(person => {
-                const totalMinutes = weeks.reduce((sum, week) => {
-                    return sum + (parseInt(person[week]) || 0);
-                }, 0);
+    musicData.forEach(person => {
+        const totalMinutes = weeks.reduce((sum, week) => {
+            return sum + (parseInt(person[week]) || 0);
+        }, 0);
 
-                const avgMinutes = Math.round(totalMinutes / weeks.length);
-                const maxWeek = weeks.reduce((max, week) => {
-                    const minutes = parseInt(person[week]) || 0;
-                    return minutes > (parseInt(person[max]) || 0) ? week : max;
-                }, weeks[0]);
+        const avgMinutes = Math.round(totalMinutes / weeks.length);
+        const maxWeek = weeks.reduce((max, week) => {
+            const minutes = parseInt(person[week]) || 0;
+            return minutes > (parseInt(person[max]) || 0) ? week : max;
+        }, weeks[0]);
 
-                const maxMinutes = parseInt(person[maxWeek]) || 0;
+        const maxMinutes = parseInt(person[maxWeek]) || 0;
+        const allMinutes = weeks.map(week => parseInt(person[week]) || 0);
 
-                // Calcular medallas
-                const medals = [];
-                let victories = 0;
-                
-                weeks.forEach(week => {
-                    const weekData = musicData.map(p => ({
-                        name: p.Persona,
-                        minutes: parseInt(p[week]) || 0
-                    })).sort((a, b) => b.minutes - a.minutes);
-                    
-                    if (weekData[0]?.name === person.Persona) victories++;
-                });
+        // Calcular medallas
+        const medals = [];
+        let victories = 0;
+        
+        weeks.forEach(week => {
+            const weekData = musicData.map(p => ({
+                name: p.Persona,
+                minutes: parseInt(p[week]) || 0
+            })).sort((a, b) => b.minutes - a.minutes);
+            
+            if (weekData[0]?.name === person.Persona) victories++;
+        });
 
-                if (victories >= 3) medals.push('<span class="medal gold">🏆 Campeón</span>');
-                if (victories >= 1) medals.push('<span class="medal silver">🥇 Ganador</span>');
-                if (totalMinutes > avgMinutes * musicData.length) medals.push('<span class="medal bronze">📈 Superaverage</span>');
-                if (maxMinutes > 5000) medals.push('<span class="medal streak">🔥 Maratón</span>');
+        const globalAvg = musicData.reduce((sum, p) => {
+            const t = weeks.reduce((s, w) => s + (parseInt(p[w]) || 0), 0);
+            return sum + t;
+        }, 0) / musicData.length;
 
-                const card = document.createElement('div');
-                card.className = 'person-card';
-                card.onclick = () => openPersonModal(person.Persona);
-                
-                card.innerHTML = `
-                    <div class="person-card-name">${person.Persona}</div>
-                    <div><strong>Total:</strong> ${totalMinutes.toLocaleString()} min</div>
-                    <div><strong>Promedio:</strong> ${avgMinutes.toLocaleString()} min/semana</div>
-                    <div><strong>Mejor semana:</strong> ${maxMinutes.toLocaleString()} min</div>
-                    <div><strong>Victorias:</strong> ${victories}</div>
-                    <div style="margin-top: 15px;">
-                        ${medals.join(' ')}
-                    </div>
-                `;
-                
-                grid.appendChild(card);
-            });
-        }
+        const isConsistent = allMinutes.every(min => min >= 300);
+        const isIron = allMinutes.every(min => min >= 100);
+        const hasZeroWeeks = allMinutes.some(min => min === 0);
+        const isSleepy = allMinutes.filter(min => min < 100).length >= 2;
+        const isVolatile = Math.max(...allMinutes) - Math.min(...allMinutes) > 2000;
+        const isBalanced = avgMinutes >= 300 && avgMinutes <= 700;
+        const isLegend = totalMinutes > 12000;
+
+        if (victories >= 3) medals.push('<span class="medal gold">🏆 Campeón</span>');
+        if (victories >= 1) medals.push('<span class="medal silver">🥇 Ganador</span>');
+        if (totalMinutes > globalAvg) medals.push('<span class="medal bronze">📈 Superaverage</span>');
+        if (maxMinutes > 5000) medals.push('<span class="medal streak">🔥 Maratón</span>');
+        if (isConsistent) medals.push('<span class="medal">📆 Consistente</span>');
+        if (isIron) medals.push('<span class="medal">🧱 Hierro</span>');
+        if (isVolatile) medals.push('<span class="medal">🎲 Volátil</span>');
+        if (isBalanced) medals.push('<span class="medal">🧠 Intelectual</span>');
+        if (isSleepy) medals.push('<span class="medal">💤 Dormido</span>');
+        if (hasZeroWeeks) medals.push('<span class="medal">👻 Fantasma</span>');
+        if (isLegend) medals.push('<span class="medal legend">👑 Leyenda</span>');
+
+        const card = document.createElement('div');
+        card.className = 'person-card';
+        card.onclick = () => openPersonModal(person.Persona);
+        
+        card.innerHTML = `
+            <div class="person-card-name">${person.Persona}</div>
+            <div><strong>Total:</strong> ${totalMinutes.toLocaleString()} min</div>
+            <div><strong>Promedio:</strong> ${avgMinutes.toLocaleString()} min/semana</div>
+            <div><strong>Mejor semana:</strong> ${maxMinutes.toLocaleString()} min</div>
+            <div><strong>Victorias:</strong> ${victories}</div>
+            <div style="margin-top: 15px;">
+                ${medals.join(' ')}
+            </div>
+        `;
+        
+        grid.appendChild(card);
+    });
+}
+
 
         function openPersonModal(personName) {
             const person = musicData.find(p => p.Persona === personName);
