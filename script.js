@@ -129,11 +129,12 @@ function updatePodium(data) {
 function updateTable(data) {
     const tbody = document.getElementById('ranking-tbody');
     tbody.innerHTML = '';
-    const imgUrl = `/data/imgs/${person.originalData.foto}`;
 
     data.forEach((person, index) => {
+        const imgUrl = `/data/imgs/${person.originalData.foto}`;
         const row = document.createElement('tr');
         const timeFormatted = formatTime(person.minutes);
+        
         let status = '';
         if (person.minutes === 0) {
             status = '🪦 Semana sin ritmo';
@@ -157,21 +158,21 @@ function updateTable(data) {
             status = '👑 DIOSES DEL STREAMING';
         }
 
-
         row.innerHTML = `
-                    <td class="position">#${index + 1}</td>
-                    <td>
-                        <img src="${imgUrl}" alt="${person.name}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin-right: 10px;">
-                        <span class="person-name" onclick="openPersonModal('${person.name}')">${person.name}</span>
-                    </td>
-                    <td>${person.minutes.toLocaleString()} minutos</td>
-                    <td>${timeFormatted}</td>
-                    <td>${status}</td>
-                `;
+            <td class="position">#${index + 1}</td>
+            <td>
+                <img src="${imgUrl}" alt="${person.name}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin-right: 10px;">
+                <span class="person-name" onclick="openPersonModal('${person.name}')">${person.name}</span>
+            </td>
+            <td>${person.minutes.toLocaleString()} minutos</td>
+            <td>${timeFormatted}</td>
+            <td>${status}</td>
+        `;
 
         tbody.appendChild(row);
     });
 }
+
 
 function formatTime(minutes) {
     if (minutes === 0) return "0 tiempo";
