@@ -591,6 +591,24 @@ function updateStats() {
         weeks.map(week => parseInt(person[week]) || 0)
     ));
 
+    // Calcular estadísticas adicionales
+    const totalWeeksWithZero = musicData.reduce((total, person) => 
+        total + weeks.filter(week => parseInt(person[week]) === 0).length, 0);
+    
+    const mostConsistentPerson = musicData.reduce((most, person) => {
+        const variance = weeks.reduce((sum, week) => {
+            const minutes = parseInt(person[week]) || 0;
+            return sum + Math.pow(minutes - avgWeeklyTime, 2);
+        }, 0) / weeks.length;
+        return (!most || variance < most.variance) ? {name: person.Persona, variance} : most;
+    }, null);
+
+    const craziestWeek = weeks.reduce((craziest, week) => {
+        const totalMinutes = musicData.reduce((sum, person) => sum + (parseInt(person[week]) || 0), 0);
+        return (!craziest || totalMinutes > craziest.total) ? 
+            {week, total: totalMinutes} : craziest;
+    }, null);
+
     globalStats.innerHTML = `
         <div class="global-stat-card">
             <h3>⏱️ Tiempo Total de Escucha</h3>
@@ -603,9 +621,24 @@ function updateStats() {
             <div class="sub-text">Por persona</div>
         </div>
         <div class="global-stat-card">
-            <h3>🏆 Mejor Semana</h3>
+            <h3>🏆 Mejor Semana Individual</h3>
             <div class="big-number">${formatTime(maxWeeklyTime)}</div>
             <div class="sub-text">Récord individual</div>
+        </div>
+        <div class="global-stat-card">
+            <h3>😴 Semanas sin Música</h3>
+            <div class="big-number">${totalWeeksWithZero}</div>
+            <div class="sub-text">Total de semanas en 0</div>
+        </div>
+        <div class="global-stat-card">
+            <h3>🎯 Más Consistente</h3>
+            <div class="big-number">${mostConsistentPerson?.name || 'N/A'}</div>
+            <div class="sub-text">Menor variación semanal</div>
+        </div>
+        <div class="global-stat-card">
+            <h3>🌟 Semana Más Loca</h3>
+            <div class="big-number">S${craziestWeek?.week.replace('S', '')}</div>
+            <div class="sub-text">${formatTime(craziestWeek?.total || 0)} en total</div>
         </div>
     `;
 
@@ -816,6 +849,67 @@ function updateAchievements() {
                     }
                     return false;
                 }
+            },
+            {
+                id: 'party',
+                title: '🎉 Rey de la Fiesta',
+                description: 'Más de 100 horas en una sola semana',
+                check: (person) => weeks.some(week => parseInt(person[week]) > 6000)
+            },
+            {
+                id: 'zombie',
+                title: '🧟‍♂️ Modo Zombie',
+                description: 'Escuchar música por más de 20 horas en 3 días seguidos',
+                check: (person) => weeks.some(week => parseInt(person[week]) > 1200)
+            },
+            {
+                id: 'phoenix',
+                title: '🦅 Ave Fénix',
+                description: 'Volver después de 3 semanas sin escuchar música con más de 2000 minutos',
+                check: (person) => {
+                    for (let i = 3; i < weeks.length; i++) {
+                        if (parseInt(person[weeks[i-3]]) === 0 && 
+                            parseInt(person[weeks[i-2]]) === 0 && 
+                            parseInt(person[weeks[i-1]]) === 0 && 
+                            parseInt(person[weeks[i]]) > 2000) return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'vampire',
+                title: '🧛‍♂️ Vampiro Musical',
+                description: 'Mantener un promedio de más de 3000 minutos por 4 semanas',
+                check: (person) => {
+                    for (let i = 3; i < weeks.length; i++) {
+                        const avg = (parseInt(person[weeks[i-3]]) + 
+                                   parseInt(person[weeks[i-2]]) + 
+                                   parseInt(person[weeks[i-1]]) + 
+                                   parseInt(person[weeks[i]])) / 4;
+                        if (avg > 3000) return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'perfectionist',
+                title: '💎 Perfeccionista',
+                description: 'Mantener exactamente el mismo tiempo (±30 min) por 3 semanas',
+                check: (person) => {
+                    for (let i = 2; i < weeks.length; i++) {
+                        const a = parseInt(person[weeks[i-2]]);
+                        const b = parseInt(person[weeks[i-1]]);
+                        const c = parseInt(person[weeks[i]]);
+                        if (Math.abs(a - b) <= 30 && Math.abs(b - c) <= 30) return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'legendary',
+                title: '🌟 Leyenda Viviente',
+                description: 'Acumular más de 50,000 minutos en total',
+                check: (person) => weeks.reduce((acc, w) => acc + (parseInt(person[w]) || 0), 0) > 50000
             }
     ];
 
