@@ -326,6 +326,42 @@ function createComparison() {
     const grid = document.getElementById('comparison-grid');
     grid.innerHTML = '';
 
+    // Calculate streaks for each person
+    musicData.forEach(person => {
+        // Calculate streaks (current and max)
+        let currentStreak = 0;
+        let maxStreak = 0;
+        let consecutiveWins = 0;
+
+        // Calculate current streak (from most recent week backwards)
+        for (let i = weeks.length - 1; i >= 0; i--) {
+            const week = weeks[i];
+            const weekWinner = musicData.reduce((winner, p) => {
+                const minutes = parseInt(p[week]) || 0;
+                const winnerMinutes = parseInt(winner[week]) || 0;
+                return minutes > winnerMinutes ? p : winner;
+            });
+
+            if (weekWinner.Persona === person.Persona) {
+                consecutiveWins++;
+                if (i === weeks.length - 1) { // If it's the most recent week, update current streak
+                    currentStreak = consecutiveWins;
+                }
+            } else {
+                if (i === weeks.length - 1) {
+                    currentStreak = 0;
+                }
+                consecutiveWins = 0;
+            }
+            maxStreak = Math.max(maxStreak, consecutiveWins);
+        }
+
+        person.currentStreak = currentStreak;
+        person.maxStreak = maxStreak;
+    });
+
+    // Grid setup
+
     musicData.forEach(person => {
         const totalMinutes = weeks.reduce((sum, week) => {
             return sum + (parseInt(person[week]) || 0);
@@ -398,8 +434,8 @@ function createComparison() {
             <div><strong>📈 Promedio:</strong> ${avgMinutes.toLocaleString()} min/semana</div>
             <div><strong>💥 Mejor semana:</strong> ${maxMinutes.toLocaleString()} min</div>
             <div><strong>🥇 Victorias:</strong> ${victories}</div>
-            <div><strong>🔥 Racha actual:</strong> ${person.streak || 0} semanas</div>
-            <div><strong>🏅 Racha máxima:</strong> ${person.maxStreak || 0} semanas</div>
+            <div><strong>🔥 Racha actual:</strong> ${person.currentStreak || 0} ${person.currentStreak === 1 ? 'semana' : 'semanas'}</div>
+            <div><strong>🏅 Racha máxima:</strong> ${person.maxStreak || 0} ${person.maxStreak === 1 ? 'semana' : 'semanas'}</div>
 
             <hr style="margin: 10px 0; border-color: #eee;">
 
