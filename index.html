@@ -28,6 +28,8 @@
             <button class="tab active" onclick="showTab('rankings')">🏆 Rankings</button>
             <button class="tab" onclick="showTab('streaks')">🔥 Streaks</button>
             <button class="tab" onclick="showTab('comparison')">👥 Comparación</button>
+            <button class="tab" onclick="showTab('stats')">📊 Estadísticas</button>
+            <button class="tab" onclick="showTab('achievements')">🎯 Logros</button>
         </div>
 
         <!-- Rankings Tab -->
@@ -74,6 +76,21 @@
         <!-- Comparison Tab -->
         <div class="content hidden" id="comparison-content">
             <div class="comparison-grid" id="comparison-grid"></div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div class="content hidden" id="stats-content">
+            <div class="stats-container">
+                <div class="global-stats" id="global-stats"></div>
+                <div class="time-distribution" id="time-distribution"></div>
+                <div class="weekly-evolution" id="weekly-evolution"></div>
+                <div class="activity-heatmap" id="activity-heatmap"></div>
+            </div>
+        </div>
+
+        <!-- Achievements Tab -->
+        <div class="content hidden" id="achievements-content">
+            <div class="achievements-grid" id="achievements-grid"></div>
         </div>
     </div>
 

@@ -574,5 +574,299 @@ window.onclick = function(event) {
     }
 }
 
+// Nuevas funciones para estadísticas avanzadas
+function updateStats() {
+    const globalStats = document.getElementById('global-stats');
+    const timeDistribution = document.getElementById('time-distribution');
+    const weeklyEvolution = document.getElementById('weekly-evolution');
+    const activityHeatmap = document.getElementById('activity-heatmap');
+
+    // Estadísticas globales
+    const totalListeningTime = musicData.reduce((total, person) => {
+        return total + weeks.reduce((sum, week) => sum + (parseInt(person[week]) || 0), 0);
+    }, 0);
+
+    const avgWeeklyTime = Math.round(totalListeningTime / (weeks.length * musicData.length));
+    const maxWeeklyTime = Math.max(...musicData.flatMap(person => 
+        weeks.map(week => parseInt(person[week]) || 0)
+    ));
+
+    globalStats.innerHTML = `
+        <div class="global-stat-card">
+            <h3>⏱️ Tiempo Total de Escucha</h3>
+            <div class="big-number">${formatTime(totalListeningTime)}</div>
+            <div class="sub-text">Entre todos los participantes</div>
+        </div>
+        <div class="global-stat-card">
+            <h3>📊 Promedio Semanal</h3>
+            <div class="big-number">${formatTime(avgWeeklyTime)}</div>
+            <div class="sub-text">Por persona</div>
+        </div>
+        <div class="global-stat-card">
+            <h3>🏆 Mejor Semana</h3>
+            <div class="big-number">${formatTime(maxWeeklyTime)}</div>
+            <div class="sub-text">Récord individual</div>
+        </div>
+    `;
+
+    // Distribución de tiempo por rango
+    const timeRanges = [
+        { min: 0, max: 60, label: '😴 0-1h' },
+        { min: 60, max: 300, label: '🌱 1-5h' },
+        { min: 300, max: 600, label: '🎵 5-10h' },
+        { min: 600, max: 1200, label: '🎧 10-20h' },
+        { min: 1200, max: 2400, label: '🔥 20-40h' },
+        { min: 2400, max: Infinity, label: '🚀 40h+' }
+    ];
+
+    const distribution = timeRanges.map(range => {
+        const count = musicData.reduce((total, person) => {
+            return total + weeks.filter(week => {
+                const minutes = parseInt(person[week]) || 0;
+                return minutes > range.min && minutes <= range.max;
+            }).length;
+        }, 0);
+        return { ...range, count };
+    });
+
+    timeDistribution.innerHTML = `
+        <h3>Distribución de Tiempo de Escucha</h3>
+        <div class="distribution-bars">
+            ${distribution.map(d => `
+                <div class="dist-bar-container">
+                    <div class="dist-bar" style="height: ${(d.count / (weeks.length * musicData.length)) * 200}px;">
+                        <div class="dist-count">${d.count}</div>
+                    </div>
+                    <div class="dist-label">${d.label}</div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+
+    // Logros y medallas especiales
+    updateAchievements();
+}
+
+function updateAchievements() {
+    const achievements = [
+        {
+            id: 'consistency',
+            title: '🎯 Consistencia Perfecta',
+            description: 'Escuchar música todos los días de la semana',
+            check: (person) => weeks.every(week => parseInt(person[week]) > 0)
+        },
+        {
+            id: 'marathon',
+            title: '🏃‍♂️ Maratonista Musical',
+            description: 'Más de 40 horas de música en una semana',
+            check: (person) => weeks.some(week => parseInt(person[week]) > 2400)
+        },
+        {
+            id: 'improvement',
+            title: '📈 Mejora Constante',
+            description: 'Aumentar el tiempo de escucha 3 semanas seguidas',
+            check: (person) => {
+                let improvements = 0;
+                for(let i = 1; i < weeks.length; i++) {
+                    if(parseInt(person[weeks[i]]) > parseInt(person[weeks[i-1]])) {
+                        improvements++;
+                        if(improvements >= 3) return true;
+                    } else {
+                        improvements = 0;
+                    }
+                }
+                return false;
+            }
+        },
+        {
+            id: 'dedication',
+            title: '💪 Dedicación Total',
+            description: 'Más de 100 horas acumuladas',
+            check: (person) => weeks.reduce((sum, week) => sum + (parseInt(person[week]) || 0), 0) > 6000
+        },
+        {
+            id: 'champion',
+            title: '👑 Campeón Indiscutible',
+            description: 'Ganar 3 semanas consecutivas',
+            check: (person) => person.maxStreak >= 3
+        },
+        {
+                id: 'earlybird',
+                title: '🌅 Madrugador Musical',
+                description: 'Escuchó música en la primera semana registrada',
+                check: (person) => parseInt(person[weeks[0]]) > 0
+            },
+            {
+                id: 'comeback',
+                title: '🔁 El Regreso',
+                description: 'Tuvo una semana de 0 minutos y volvió con +1000 minutos',
+                check: (person) => {
+                    for (let i = 1; i < weeks.length; i++) {
+                        if (parseInt(person[weeks[i - 1]]) === 0 && parseInt(person[weeks[i]]) > 1000) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'burnout',
+                title: '🔥 Quemao del Sistema',
+                description: 'Escuchó más de 3000 minutos una semana y 0 la siguiente',
+                check: (person) => {
+                    for (let i = 1; i < weeks.length; i++) {
+                        if (parseInt(person[weeks[i - 1]]) > 3000 && parseInt(person[weeks[i]]) === 0) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'peaktime',
+                title: '📊 Pico de Locura',
+                description: 'Tuvo una semana con más de 5000 minutos',
+                check: (person) => weeks.some(week => parseInt(person[week]) > 5000)
+            },
+            {
+                id: 'rollercoaster',
+                title: '🎢 Montaña Rusa',
+                description: 'Subidas y bajadas extremas durante 4 semanas seguidas',
+                check: (person) => {
+                    let swings = 0;
+                    for (let i = 2; i < weeks.length; i++) {
+                        const a = parseInt(person[weeks[i - 2]]);
+                        const b = parseInt(person[weeks[i - 1]]);
+                        const c = parseInt(person[weeks[i]]);
+                        if ((a < b && b > c) || (a > b && b < c)) {
+                            swings++;
+                            if (swings >= 2) return true;
+                        }
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'lazyweek',
+                title: '😴 Semana de Vago',
+                description: 'Menos de 30 minutos en una semana',
+                check: (person) => weeks.some(week => parseInt(person[week]) > 0 && parseInt(person[week]) < 30)
+            },
+            {
+                id: 'resilient',
+                title: '🧠 Mente Fuerte',
+                description: 'Tuvo una baja grande y logró reponerse con más de 2000 minutos',
+                check: (person) => {
+                    for (let i = 1; i < weeks.length; i++) {
+                        const before = parseInt(person[weeks[i - 1]]);
+                        const now = parseInt(person[weeks[i]]);
+                        if (before < 300 && now > 2000) return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'vacation',
+                title: '🏖️ Vacaciones Musicales',
+                description: 'Dos semanas seguidas sin escuchar música',
+                check: (person) => {
+                    for (let i = 1; i < weeks.length; i++) {
+                        if (parseInt(person[weeks[i - 1]]) === 0 && parseInt(person[weeks[i]]) === 0) return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'machine',
+                title: '🤖 Máquina de Escuchar',
+                description: 'Más de 10,000 minutos acumulados',
+                check: (person) => weeks.reduce((acc, w) => acc + (parseInt(person[w]) || 0), 0) > 10000
+            },
+            {
+                id: 'bounceback',
+                title: '💥 Rebotador',
+                description: 'Alternó entre más de 2000 y menos de 500 minutos varias veces',
+                check: (person) => {
+                    let count = 0;
+                    for (let i = 1; i < weeks.length; i++) {
+                        const prev = parseInt(person[weeks[i - 1]]);
+                        const curr = parseInt(person[weeks[i]]);
+                        if ((prev > 2000 && curr < 500) || (prev < 500 && curr > 2000)) {
+                            count++;
+                            if (count >= 2) return true;
+                        }
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'balanced',
+                title: '⚖️ Equilibrio Perfecto',
+                description: 'Mantener entre 5-10 horas por semana durante 4 semanas',
+                check: (person) => {
+                    let balancedWeeks = 0;
+                    for(let week of weeks) {
+                        const minutes = parseInt(person[week]);
+                        if(minutes >= 300 && minutes <= 600) {
+                            balancedWeeks++;
+                            if(balancedWeeks >= 4) return true;
+                        } else {
+                            balancedWeeks = 0;
+                        }
+                    }
+                    return false;
+                }
+            }
+    ];
+
+    const achievementsGrid = document.getElementById('achievements-grid');
+    achievementsGrid.innerHTML = '';
+
+    musicData.forEach(person => {
+        const personAchievements = achievements.filter(a => a.check(person));
+        
+        if(personAchievements.length > 0) {
+            const card = document.createElement('div');
+            card.className = 'achievement-card';
+            card.innerHTML = `
+                <div class="achievement-header">
+                    <img src="/data/imgs/${person.foto}" alt="${person.Persona}">
+                    <h3>${person.Persona}</h3>
+                </div>
+                <div class="achievements-list">
+                    ${personAchievements.map(a => `
+                        <div class="achievement">
+                            <div class="achievement-title">${a.title}</div>
+                            <div class="achievement-desc">${a.description}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            achievementsGrid.appendChild(card);
+        }
+    });
+}
+
+// Modificamos processData para incluir las nuevas funciones
+function processData() {
+    // Extraer semanas de los datos
+    const firstPerson = musicData[0];
+    weeks = Object.keys(firstPerson).filter(key => key.startsWith('S') && key.match(/^S\d+/));
+    weeks.sort((a, b) => {
+        const numA = parseInt(a.replace('S', ''));
+        const numB = parseInt(b.replace('S', ''));
+        return numA - numB;
+    });
+
+    if (weeks.length > 0) {
+        currentWeek = weeks[weeks.length - 1]; // Última semana por defecto
+        createWeekSelector();
+        updateRankings();
+        calculateStreaks();
+        createComparison();
+        updateStats(); // Añadimos la nueva función
+    }
+}
+
 // Cargar datos al iniciar
 loadData();
