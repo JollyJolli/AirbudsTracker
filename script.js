@@ -386,7 +386,7 @@ function calculateStreaks() {
                     .sort((a, b) => b.maxStreak - a.maxStreak)
                     .map(stats => `
                         <div class="streak-card">
-                            <div class="streak-card-header">
+                            <div class="streak-card-header" onclick="openPersonModal('${stats.name}')" style="cursor: pointer;">
                                 <img src="/data/imgs/${stats.foto}" alt="${stats.name}">
                                 <h3>${stats.name}</h3>
                             </div>
@@ -1290,7 +1290,7 @@ function updateAchievements() {
             card.innerHTML = `
                 <div class="achievement-header">
                     <img src="/data/imgs/${person.foto}" alt="${person.Persona}">
-                    <h3>${person.Persona}</h3>
+                    <h3 >${person.Persona}</h3> 
                 </div>
                 <div class="achievements-list">
                     ${personAchievements.map(a => `

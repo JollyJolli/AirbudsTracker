@@ -30,6 +30,7 @@
             <button class="tab" onclick="showTab('comparison')">👥 Comparación</button>
             <button class="tab" onclick="showTab('stats')">📊 Estadísticas</button>
             <button class="tab" onclick="showTab('achievements')">🎯 Logros</button>
+            <button class="tab" onclick="showTab('help')">❓ Ayuda</button>
         </div>
 
         <!-- Rankings Tab -->
@@ -91,6 +92,74 @@
         <!-- Achievements Tab -->
         <div class="content hidden" id="achievements-content">
             <div class="achievements-grid" id="achievements-grid"></div>
+        </div>
+
+        <!-- Help Tab -->
+        <div class="content hidden" id="help-content">
+            <div class="help-section">
+                <div class="help-card">
+                    <h3>🏆 Rankings</h3>
+                    <p>El ranking muestra el tiempo de escucha semanal de cada participante. Cada semana comienza el lunes y termina el domingo.</p>
+                </div>
+                
+                <div class="help-card">
+                    <h3>👥 Rival</h3>
+                    <p>Tu rival es la persona que está justo por encima de ti en el ranking. ¡Supéralo para subir de posición!</p>
+                </div>
+
+                <div class="help-card">
+                    <h3>🔥 Racha (Streak)</h3>
+                    <p>Una racha es el número de semanas consecutivas que alguien ha estado en primer lugar. Se pierde si alguien más gana esa semana.</p>
+                </div>
+
+                <div class="help-card">
+                    <h3>📊 Estadísticas</h3>
+                    <p>Las estadísticas muestran tu evolución a lo largo del tiempo, distribución de escucha y patrones de actividad.</p>
+                </div>
+
+                <div class="help-card">
+                    <h3>🎯 Logros</h3>
+                    <p>Los logros son reconocimientos especiales que puedes desbloquear al cumplir ciertos objetivos como mantener rachas o superar tiempos de escucha.</p>
+                </div>
+
+                <div class="help-card">
+                    <h3>🏅 Medallas</h3>
+                    <p>Estas son todas las medallas que puedes conseguir:</p>
+                    <ul class="medals-list">
+                        <li><span class="medal gold">🏆 Campeón</span> - Gana 3 o más semanas</li>
+                        <li><span class="medal silver">🥇 Ganador</span> - Gana al menos 1 semana</li>
+                        <li><span class="medal bronze">📈 Superaverage</span> - Supera el promedio global de escucha</li>
+                        <li><span class="medal streak">🔥 Maratón</span> - Supera los 5000 minutos en una semana</li>
+                        <li><span class="medal">📆 Consistente</span> - Mantén 300+ minutos cada semana</li>
+                        <li><span class="medal">🧱 Hierro</span> - Mantén 100+ minutos cada semana</li>
+                        <li><span class="medal">🎲 Volátil</span> - Ten una diferencia de 2000+ minutos entre tu mejor y peor semana</li>
+                        <li><span class="medal">🧠 Intelectual</span> - Mantén un promedio entre 300 y 700 minutos</li>
+                        <li><span class="medal">💤 Dormido</span> - Ten 2 o más semanas con menos de 100 minutos</li>
+                        <li><span class="medal">👻 Fantasma</span> - Ten al menos una semana sin escuchar música</li>
+                        <li><span class="medal legend">👑 Leyenda</span> - Supera los 12000 minutos totales</li>
+                    </ul>
+                </div>
+
+                <div class="help-card">
+                    <h3>📈 Estados y Niveles</h3>
+                    <p>Tu nivel semanal depende de tus minutos de escucha:</p>
+                    <ul class="levels-list">
+                        <li>🪦 <strong>Semana sin ritmo</strong> - 0 minutos</li>
+                        <li>😶 <strong>Silencio sospechoso</strong> - 1-15 minutos</li>
+                        <li>😴 <strong>Modo siesta</strong> - 15-30 minutos</li>
+                        <li>🌱 <strong>Brote musical</strong> - 30-60 minutos</li>
+                        <li>🎵 <strong>Melómano casual</strong> - 60-120 minutos</li>
+                        <li>🎧 <strong>Audiófilo</strong> - 120-300 minutos</li>
+                        <li>🔥 <strong>En llamas</strong> - 300-600 minutos</li>
+                        <li>💫 <strong>Estrella musical</strong> - 600-1000 minutos</li>
+                        <li>🌟 <strong>Superestrella</strong> - 1000-2000 minutos</li>
+                        <li>👑 <strong>Realeza del ritmo</strong> - 2000-3000 minutos</li>
+                        <li>🌈 <strong>Leyenda viviente</strong> - 3000-4000 minutos</li>
+                        <li>🎯 <strong>Élite musical</strong> - 4000-5000 minutos</li>
+                        <li>💫 <strong>Ascendido</strong> - 5000+ minutos</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
