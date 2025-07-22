@@ -1,13 +1,23 @@
 * {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #4A90E2;
+    --accent-color: #FF6B6B;
+    --gradient-start: #2193b0;
+    --gradient-end: #6dd5ed;
+    --card-bg: #ffffff;
+    --text-primary: #333333;
+    --text-secondary: #666666;
 }
 
 body {
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+    color: var(--text-primary);
 
 /* Nuevos estilos para estadísticas y logros */
 .stats-container {
@@ -500,18 +510,248 @@ body {
 }
 
 .streak-section {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-	gap: 30px;
-	margin-bottom: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 30px;
+    padding: 20px;
+}
+
+/* Banner de racha actual */
+.current-streak-banner {
+    background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+    border-radius: 20px;
+    padding: 30px;
+    margin: 20px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(255, 107, 107, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.current-streak-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+    animation: rotate 20s linear infinite;
+}
+
+.current-streak-banner h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.streak-highlight {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    position: relative;
+    z-index: 1;
+}
+
+.streak-highlight img {
+    width: 120px !important;
+    height: 120px !important;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 6px solid rgba(255,255,255,0.8);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+}
+
+.streak-highlight img:hover {
+    transform: scale(1.05);
+}
+
+.streak-info {
+    text-align: left;
+}
+
+.streak-person {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.streak-count {
+    font-size: 1.5em;
+    opacity: 0.9;
+}
+
+/* Tarjetas de racha */
+.streaks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+    padding: 20px;
 }
 
 .streak-card {
-	background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-	color: white;
-	padding: 25px;
-	border-radius: 15px;
-	box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.streak-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
+}
+
+.streak-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.streak-card-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.streak-card-header img {
+    width: 80px !important;
+    height: 80px !important;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.streak-card-header img:hover {
+    transform: rotate(5deg);
+}.streak-stats {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    transition: background-color 0.2s ease;
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-row:hover {
+    background-color: #f0f2f5;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.stat-row span:first-child {
+    color: var(--text-secondary);
+    font-size: 0.95em;
+}
+
+.stat-row span:last-child {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.streak-history {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #f0f2f5;
+}
+
+.streak-history h4 {
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.mini-streak {
+    background: linear-gradient(135deg, #f6f8ff, #f0f2f5);
+    padding: 10px 15px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    border-left: 4px solid var(--primary-color);
+}
+
+.mini-streak:hover {
+    transform: translateX(5px);
+    background: linear-gradient(135deg, #f0f2f5, #e9ecef);
+}
+
+/* Animaciones */
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .streak-highlight {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .streak-info {
+        text-align: center;
+    }
+
+    .streak-person {
+        font-size: 2em;
+    }
+
+    .streak-count {
+        font-size: 1.2em;
+    }
+
+    .streak-card-header {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+.streak-card:hover {
+    transform: translateY(-5px);
 }
 
 .streak-card.historical {

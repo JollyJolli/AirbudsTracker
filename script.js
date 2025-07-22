@@ -245,6 +245,7 @@ function calculateStreaks() {
     let bestStreakPerson = '';
     let bestStreakCount = 0;
     let bestStreakWeeks = [];
+    const streaksContainer = document.getElementById('streaks-content');
 
     // Calcular streak actual (desde la última semana hacia atrás)
     let lastWinner = '';
@@ -269,57 +270,167 @@ function calculateStreaks() {
         }
     }
 
-    // Calcular mejor streak histórico
-    const streaks = {};
-    for (const person of musicData) {
-        let maxStreak = 0;
+    // Calcular estadísticas de streak para cada persona
+    const personalStats = musicData.map(person => {
+        let stats = {
+            name: person.Persona,
+            foto: person.foto,
+            currentStreak: 0,
+            maxStreak: 0,
+            totalVictories: 0,
+            bestMargin: 0,
+            bestMarginWeek: '',
+            closestCalls: [],
+            rivalInfo: { rival: '', losses: 0 },
+            streakHistory: []
+        };
+
         let currentPersonStreak = 0;
-        let streakWeeks = [];
         let tempWeeks = [];
 
-        for (const week of weeks) {
+        // Calcular rachas y victorias
+        for (let i = 0; i < weeks.length; i++) {
+            const week = weeks[i];
             const weekData = musicData.map(p => ({
                 name: p.Persona,
                 minutes: parseInt(p[week]) || 0
             })).sort((a, b) => b.minutes - a.minutes);
 
-            const winner = weekData[0]?.name;
-            if (winner === person.Persona) {
+            const personMinutes = parseInt(person[week]) || 0;
+            const winner = weekData[0];
+            const runnerUp = weekData[1];
+
+            if (winner.name === person.Persona) {
+                stats.totalVictories++;
                 currentPersonStreak++;
                 tempWeeks.push(week);
+
+                // Calcular margen de victoria
+                const margin = winner.minutes - runnerUp.minutes;
+                if (margin > stats.bestMargin) {
+                    stats.bestMargin = margin;
+                    stats.bestMarginWeek = week;
+                }
             } else {
-                if (currentPersonStreak > maxStreak) {
-                    maxStreak = currentPersonStreak;
-                    streakWeeks = [...tempWeeks];
+                // Registrar victorias ajustadas (perdidas por menos de 100 minutos)
+                const margin = winner.minutes - personMinutes;
+                if (margin <= 100 && margin > 0) {
+                    stats.closestCalls.push({
+                        week: week,
+                        margin: margin,
+                        winner: winner.name
+                    });
+                }
+
+                // Actualizar rival más frecuente
+                if (winner.name !== stats.rivalInfo.rival) {
+                    if (stats.rivalInfo.losses === 0) {
+                        stats.rivalInfo.rival = winner.name;
+                        stats.rivalInfo.losses = 1;
+                    } else {
+                        stats.rivalInfo.losses++;
+                    }
+                }
+
+                if (currentPersonStreak > 0) {
+                    stats.streakHistory.push({
+                        length: currentPersonStreak,
+                        weeks: [...tempWeeks]
+                    });
                 }
                 currentPersonStreak = 0;
                 tempWeeks = [];
             }
+
+            // Actualizar racha máxima
+            if (currentPersonStreak > stats.maxStreak) {
+                stats.maxStreak = currentPersonStreak;
+            }
         }
 
-        // Verificar el último streak
-        if (currentPersonStreak > maxStreak) {
-            maxStreak = currentPersonStreak;
-            streakWeeks = [...tempWeeks];
+        // Verificar la última racha
+        if (currentPersonStreak > 0) {
+            stats.streakHistory.push({
+                length: currentPersonStreak,
+                weeks: [...tempWeeks]
+            });
+            if (currentPersonStreak > stats.maxStreak) {
+                stats.maxStreak = currentPersonStreak;
+            }
         }
 
-        if (maxStreak > bestStreakCount) {
-            bestStreakCount = maxStreak;
-            bestStreakPerson = person.Persona;
-            bestStreakWeeks = streakWeeks;
-        }
-    }
+        // Ordenar y limitar las rachas históricas
+        stats.streakHistory.sort((a, b) => b.length - a.length);
+        stats.currentStreak = tempWeeks.length;
 
-    // Actualizar UI
-    document.getElementById('current-streak-value').textContent = currentStreakCount;
-    document.getElementById('current-streak-person').textContent = currentStreakPerson;
-    document.getElementById('current-streak-weeks').textContent =
-        currentStreakCount > 1 ? `${currentStreakCount} semanas consecutivas` : '1 semana';
+        return stats;
+    });
 
-    document.getElementById('best-streak-value').textContent = bestStreakCount;
-    document.getElementById('best-streak-person').textContent = bestStreakPerson;
-    document.getElementById('best-streak-weeks').textContent =
-        bestStreakWeeks.length > 0 ? `Semanas: ${bestStreakWeeks.map(w => w.replace('S', '')).join(', ')}` : '';
+    // Actualizar UI con toda la información
+    streaksContainer.innerHTML = `
+        <div class="current-streak-banner">
+            <h2>🔥 Racha Actual</h2>
+            <div class="streak-highlight">
+                <img src="/data/imgs/${musicData.find(p => p.Persona === currentStreakPerson)?.foto}" alt="${currentStreakPerson}">
+                <div class="streak-info">
+                    <div class="streak-person">${currentStreakPerson}</div>
+                    <div class="streak-count">${currentStreakCount} ${currentStreakCount === 1 ? 'semana' : 'semanas'}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="historical-streaks">
+            <h2>🏆 Mejores Rachas Históricas</h2>
+            <div class="streaks-grid">
+                ${personalStats
+                    .sort((a, b) => b.maxStreak - a.maxStreak)
+                    .map(stats => `
+                        <div class="streak-card">
+                            <div class="streak-card-header">
+                                <img src="/data/imgs/${stats.foto}" alt="${stats.name}">
+                                <h3>${stats.name}</h3>
+                            </div>
+                            <div class="streak-stats">
+                                <div class="stat-row">
+                                    <span>🌟 Mejor Racha:</span>
+                                    <span>${stats.maxStreak} semanas</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>🏅 Victorias Totales:</span>
+                                    <span>${stats.totalVictories}</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>💪 Mejor Victoria:</span>
+                                    <span>+${stats.bestMargin.toLocaleString()} min (S${stats.bestMarginWeek.replace('S', '')})</span>
+                                </div>
+                                ${stats.closestCalls.length > 0 ? `
+                                    <div class="stat-row">
+                                        <span>😅 Casi Gana:</span>
+                                        <span>${stats.closestCalls.length} veces</span>
+                                    </div>
+                                ` : ''}
+                                ${stats.rivalInfo.losses > 1 ? `
+                                    <div class="stat-row">
+                                        <span>😤 Rival:</span>
+                                        <span>${stats.rivalInfo.rival} (${stats.rivalInfo.losses})</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            ${stats.streakHistory.length > 0 ? `
+                                <div class="streak-history">
+                                    <h4>📊 Historial de Rachas</h4>
+                                    ${stats.streakHistory.slice(0, 3).map(streak => `
+                                        <div class="mini-streak">
+                                            ${streak.length} semanas (S${streak.weeks[0].replace('S', '')} - S${streak.weeks[streak.weeks.length-1].replace('S', '')})
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+            </div>
+        </div>
+    `;
 }
 
 function createComparison() {
