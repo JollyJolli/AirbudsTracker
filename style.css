@@ -331,34 +331,57 @@ body {
 }
 
 .tabs {
-	display: flex;
-	justify-content: center;
-	margin-bottom: 30px;
-	flex-wrap: wrap;
-	gap: 10px;
+    display: flex;
+    justify-content: center;
+    margin: 0 -10px 30px -10px;
+    flex-wrap: nowrap;
+    gap: 5px;
+    padding: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 10px;
+}
+
+.tabs::-webkit-scrollbar {
+    height: 3px;
+}
+
+.tabs::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.tabs::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
 }
 
 .tab {
-	background: rgba(255, 255, 255, 0.2);
-	color: white;
-	border: none;
-	padding: 12px 24px;
-	border-radius: 25px;
-	cursor: pointer;
-	font-size: 16px;
-	transition: all 0.3s ease;
-	backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    white-space: nowrap;
+    scroll-snap-align: start;
+    flex: 0 0 auto;
 }
 
 .tab:hover {
-	background: rgba(255, 255, 255, 0.3);
-	transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
 }
 
 .tab.active {
-	background: white;
-	color: #667eea;
-	font-weight: bold;
+    background: white;
+    color: #667eea;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
 }
 
 .content {
@@ -1020,32 +1043,39 @@ body {
 }
 
 @media (max-width: 600px) {
-	body {
-		font-size: 14px;
-	}
+    body {
+        font-size: 14px;
+    }
 
-	.container {
-		padding: 10px 15px;
-	}
+    .container {
+        padding: 10px 15px;
+    }
 
-	.header h1 {
-		font-size: 1.8em;
-	}
+    .header h1 {
+        font-size: 1.8em;
+    }
 
-	.header p {
-		font-size: 1em;
-	}
+    .header p {
+        font-size: 1em;
+    }
 
-	.tabs {
-		flex-direction: column;
-		align-items: stretch;
-	}
+    .tabs {
+        margin: 0 -15px 20px -15px;
+        padding: 10px 15px;
+        justify-content: flex-start;
+        gap: 8px;
+    }
 
-	.tab {
-		width: 100%;
-		font-size: 15px;
-		padding: 10px;
-	}
+    .tab {
+        font-size: 14px;
+        padding: 10px 20px;
+        min-width: auto;
+        flex-shrink: 0;
+    }
+
+    .tab.active {
+        transform: scale(1.05);
+    }
 
 	.week-selector {
 		flex-direction: column;

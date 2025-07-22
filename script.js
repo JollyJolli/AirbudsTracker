@@ -910,6 +910,260 @@ function updateAchievements() {
                 }
             },
             {
+                id: 'yooyo',
+                title: '🎧 Yo, Yo, Yo!',
+                description: 'Escuchó música en al menos 10 semanas distintas',
+                check: (person) => weeks.filter(w => parseInt(person[w]) > 0).length >= 10
+            },
+            {
+                id: 'unstoppable',
+                title: '🚂 Imparable',
+                description: '5 semanas seguidas sin bajar el ritmo (más de 1000 minutos cada una)',
+                check: (person) => {
+                    let streak = 0;
+                    for (let w of weeks) {
+                        if (parseInt(person[w]) > 1000) {
+                            streak++;
+                            if (streak >= 5) return true;
+                        } else {
+                            streak = 0;
+                        }
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'yoelcallejero',
+                title: '🕶️ Callejero Musical',
+                description: 'Tuvo una semana con exactamente 420 minutos escuchados',
+                check: (person) => weeks.some(w => parseInt(person[w]) === 420)
+            },
+            {
+                id: 'sleepmode',
+                title: '🛌 Modo Sueño',
+                description: 'Tuvo 3 semanas con menos de 60 minutos',
+                check: (person) => weeks.filter(w => parseInt(person[w]) < 60 && parseInt(person[w]) > 0).length >= 3
+            },
+            {
+                id: 'oscillator',
+                title: '📉 Oscilador',
+                description: 'Tuvo más de 4 cambios de +1000/-1000 entre semanas',
+                check: (person) => {
+                    let count = 0;
+                    for (let i = 1; i < weeks.length; i++) {
+                        const diff = Math.abs(parseInt(person[weeks[i]]) - parseInt(person[weeks[i-1]]));
+                        if (diff > 1000) count++;
+                        if (count >= 4) return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'weeklywarrior',
+                title: '📆 Guerrero Semanal',
+                description: 'Tuvo actividad en cada semana sin ninguna en 0',
+                check: (person) => weeks.every(w => parseInt(person[w]) > 0)
+            },
+            {
+                id: 'onandoff',
+                title: '🔌 On & Off',
+                description: 'Alternó una semana con música y otra sin nada por 4 semanas',
+                check: (person) => {
+                    let count = 0;
+                    for (let i = 1; i < weeks.length; i++) {
+                        const prev = parseInt(person[weeks[i-1]]);
+                        const curr = parseInt(person[weeks[i]]);
+                        if ((prev === 0 && curr > 0) || (prev > 0 && curr === 0)) {
+                            count++;
+                            if (count >= 3) return true;
+                        } else {
+                            count = 0;
+                        }
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'minutemaster',
+                title: '⏱️ Maestro del Minuto',
+                description: 'Tuvo al menos una semana con exactamente 100 minutos',
+                check: (person) => weeks.some(w => parseInt(person[w]) === 100)
+            },
+            {
+                id: 'tryhard',
+                title: '🧗 Tryhard del Ritmo',
+                description: 'Subió 3 veces seguidas más de 1000 minutos semana tras semana',
+                check: (person) => {
+                    let streak = 0;
+                    for (let i = 1; i < weeks.length; i++) {
+                        const diff = parseInt(person[weeks[i]]) - parseInt(person[weeks[i - 1]]);
+                        if (diff > 1000) {
+                            streak++;
+                            if (streak >= 3) return true;
+                        } else {
+                            streak = 0;
+                        }
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'completo',
+                title: '✅ Lo Hizo To’',
+                description: 'Tuvo al menos una semana con menos de 10 minutos y otra con más de 4000',
+                check: (person) => {
+                    let hasLow = false, hasHigh = false;
+                    for (let w of weeks) {
+                        const val = parseInt(person[w]);
+                        if (val < 10 && val > 0) hasLow = true;
+                        if (val > 4000) hasHigh = true;
+                    }
+                    return hasLow && hasHigh;
+                }
+            },
+            {
+                id: 'flipflop',
+                title: '👟 Flip Flop',
+                description: 'Tuvo exactamente 0 minutos en al menos 5 semanas alternadas',
+                check: (person) => {
+                    let zeros = 0;
+                    for (let i = 0; i < weeks.length; i += 2) {
+                        if (parseInt(person[weeks[i]]) === 0) zeros++;
+                    }
+                    return zeros >= 5;
+                }
+            },
+            {
+                id: 'faststarter',
+                title: '🚀 Empezó Con To’',
+                description: 'Tuvo más de 2000 minutos en la primera semana registrada',
+                check: (person) => parseInt(person[weeks[0]]) > 2000
+            },
+            {
+                id: 'clutch',
+                title: '⏳ Clutch Final',
+                description: 'En la última semana registrada, escuchó más de 3000 minutos',
+                check: (person) => parseInt(person[weeks[weeks.length - 1]]) > 3000
+            },
+            {
+                id: 'misteriostar',
+                title: '🌌 Misterioso',
+                description: 'Tuvo 3 semanas exactamente en 666 minutos',
+                check: (person) => weeks.filter(w => parseInt(person[w]) === 666).length >= 3
+            },
+            {
+                id: 'semisemana',
+                title: '🧩 Media Semanita',
+                description: 'Tuvo entre 200 y 250 minutos en una semana',
+                check: (person) => weeks.some(w => {
+                    const m = parseInt(person[w]);
+                    return m >= 200 && m <= 250;
+                })
+            },
+            {
+                id: 'carreramusical',
+                title: '🎓 Carrera Musical',
+                description: '10 semanas acumuladas con más de 1000 minutos',
+                check: (person) => weeks.filter(w => parseInt(person[w]) > 1000).length >= 10
+            },
+            {
+                id: 'calmado',
+                title: '🧘 Ritmo Zen',
+                description: 'Tuvo exactamente 333 minutos en una semana',
+                check: (person) => weeks.some(w => parseInt(person[w]) === 333)
+            },
+            {
+                id: 'altibajos',
+                title: '↕️ Subo y Bajo',
+                description: 'Alternó más de 5 veces entre semanas altas (>2000) y bajas (<200)',
+                check: (person) => {
+                    let count = 0;
+                    for (let i = 1; i < weeks.length; i++) {
+                        const prev = parseInt(person[weeks[i - 1]]);
+                        const curr = parseInt(person[weeks[i]]);
+                        if ((prev > 2000 && curr < 200) || (prev < 200 && curr > 2000)) {
+                            count++;
+                            if (count >= 5) return true;
+                        }
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'promediador',
+                title: '📏 Promedio Perfecto',
+                description: 'Tuvo un promedio de exactamente 1000 minutos en las últimas 4 semanas',
+                check: (person) => {
+                    if (weeks.length < 4) return false;
+                    const last4 = weeks.slice(-4);
+                    const total = last4.reduce((acc, w) => acc + (parseInt(person[w]) || 0), 0);
+                    return total === 4000;
+                }
+            },
+            {
+                id: 'picosgemelos',
+                title: '🗻 Picos Gemelos',
+                description: 'Tuvo dos semanas no consecutivas con más de 5000 minutos',
+                check: (person) => {
+                    let peaks = 0;
+                    for (let i = 0; i < weeks.length; i++) {
+                        if (parseInt(person[weeks[i]]) > 5000) {
+                            peaks++;
+                            if (peaks >= 2) return true;
+                        }
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'preciso',
+                title: '🎯 Precisión Máxima',
+                description: 'Tuvo una semana con exactamente 1000 minutos',
+                check: (person) => weeks.some(w => parseInt(person[w]) === 1000)
+            },
+            {
+                id: 'constante',
+                title: '🏗️ Constante Real',
+                description: '3 semanas seguidas con tiempo entre 900 y 1100 minutos',
+                check: (person) => {
+                    let streak = 0;
+                    for (let w of weeks) {
+                        const m = parseInt(person[w]);
+                        if (m >= 900 && m <= 1100) {
+                            streak++;
+                            if (streak >= 3) return true;
+                        } else {
+                            streak = 0;
+                        }
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'explosivo',
+                title: '💣 Semana Explosiva',
+                description: 'Aumentó más de 3000 minutos respecto a la semana anterior',
+                check: (person) => {
+                    for (let i = 1; i < weeks.length; i++) {
+                        const diff = parseInt(person[weeks[i]]) - parseInt(person[weeks[i-1]]);
+                        if (diff > 3000) return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                id: 'resbalon',
+                title: '🥴 Se Cayó del Ritmo',
+                description: 'Bajó más de 2000 minutos de una semana a otra',
+                check: (person) => {
+                    for (let i = 1; i < weeks.length; i++) {
+                        const diff = parseInt(person[weeks[i-1]]) - parseInt(person[weeks[i]]);
+                        if (diff > 2000) return true;
+                    }
+                    return false;
+                }
+            },
+            {
                 id: 'vacation',
                 title: '🏖️ Vacaciones Musicales',
                 description: 'Dos semanas seguidas sin escuchar música',
