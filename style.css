@@ -8,6 +8,40 @@ body {
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	color: #333;
+
+/* Week selector styles */
+.week-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.week-dropdown {
+    display: none;
+    width: 100%;
+    max-width: 300px;
+    padding: 10px;
+    margin: 0 auto 20px;
+    border: 2px solid #764ba2;
+    border-radius: 8px;
+    background-color: white;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+}
+
+/* Media query for mobile devices */
+@media screen and (max-width: 768px) {
+    .week-buttons {
+        display: none;
+    }
+    
+    .week-dropdown {
+        display: block;
+    }
+}
 	min-height: 100vh;
 }
 

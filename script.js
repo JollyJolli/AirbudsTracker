@@ -63,13 +63,34 @@ function createWeekSelector() {
     const selector = document.getElementById('week-selector');
     selector.innerHTML = '';
 
+    // Create buttons for desktop
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'week-buttons';
+    
     weeks.forEach(week => {
         const btn = document.createElement('button');
         btn.className = `week-btn ${week === currentWeek ? 'active' : ''}`;
         btn.textContent = `Semana ${week.replace('S', '')}`;
         btn.onclick = () => selectWeek(week);
-        selector.appendChild(btn);
+        buttonContainer.appendChild(btn);
     });
+
+    // Create dropdown for mobile
+    const dropdown = document.createElement('select');
+    dropdown.className = 'week-dropdown';
+    
+    weeks.forEach(week => {
+        const option = document.createElement('option');
+        option.value = week;
+        option.selected = week === currentWeek;
+        option.textContent = `Semana ${week.replace('S', '')}`;
+        dropdown.appendChild(option);
+    });
+    
+    dropdown.onchange = (e) => selectWeek(e.target.value);
+
+    selector.appendChild(buttonContainer);
+    selector.appendChild(dropdown);
 }
 
 function selectWeek(week) {
@@ -97,11 +118,11 @@ function updatePodium(data) {
     const podium = document.getElementById('podium');
     podium.innerHTML = '';
 
-    const positions = ['second', 'first', 'third'];
-    const positionNumbers = [2, 1, 3];
+    const positions = ['first', 'second', 'third'];
+    const positionNumbers = [1, 2, 3];
 
     for (let i = 0; i < Math.min(3, data.length); i++) {
-        const person = data[i === 0 ? 0 : i === 1 ? 1 : 2];
+        const person = data[i];
         const imgUrl = `/data/imgs/${person.originalData.foto}`;
         if (!person) continue;
 
